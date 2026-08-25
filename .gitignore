@@ -1,0 +1,23 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# ChromaDB
+chroma_db/
+
+# Local data
+data/raw/
+data/extracted_pages.json
+
+# Environment variables / secrets
+.env
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
