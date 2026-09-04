@@ -2,11 +2,11 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 
-MODEL_NAME = "all-MiniLM-L6-v2"
+# Load the same embedding model used during ingestion
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-model = SentenceTransformer(MODEL_NAME)
-
+# Open persistent ChromaDB
 client = chromadb.PersistentClient(
     path="./chroma_db"
 )
@@ -16,13 +16,18 @@ collection = client.get_collection(
 )
 
 
-def retrieve(query, n_results=3):
+def retrieve(question, top_k=5):
+    """
+    Retrieve the most relevant chunks for a question.
+    """
 
-    query_embedding = model.encode(query)
+    # Convert the question into an embedding
+    query_embedding = model.encode(question)
 
+    # Search ChromaDB
     results = collection.query(
         query_embeddings=[query_embedding.tolist()],
-        n_results=n_results
+        n_results=top_k
     )
 
     retrieved_chunks = []
@@ -38,13 +43,15 @@ def retrieve(query, n_results=3):
 
     return retrieved_chunks
 
+
 if __name__ == "__main__":
 
-    results = retrieve(
-        "What is the nominal thrust of the Service Module engine?"
-    )
+    question = "What is the purpose of technical reviews?"
+
+    results = retrieve(question, top_k=5)
 
     for result in results:
-        print("\nPage:", result["page"])
-        print("Distance:", result["distance"])
-        print("Text:", result["text"])
+
+        print(f"\nPage: {result['page']}")
+        print(f"Distance: {result['distance']}")
+        print(f"Text: {result['text']}")
