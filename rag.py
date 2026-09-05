@@ -3,17 +3,20 @@ from generator import generate_answer
 
 
 def build_context(results):
-    """
-    Convert retrieved chunks into a single context string.
-    """
-
     context_parts = []
+    seen_texts = set()
 
     for result in results:
+        text = result["text"].strip()
+
+        if text in seen_texts:
+            continue
+
+        seen_texts.add(text)
 
         context_parts.append(
             f"[Source: {result['source']}, Page: {result['page']}]\n"
-            f"{result['text']}"
+            f"{text}"
         )
 
     return "\n\n".join(context_parts)
@@ -38,8 +41,8 @@ def answer_question(question):
 
 if __name__ == "__main__":
 
-    question = "What is systems engineering?"
-
+    #question = "What is systems engineering?"
+    question = "What is the difference between verification and validation?"
     answer, results = answer_question(question)
 
     print("\n" + "=" * 70)

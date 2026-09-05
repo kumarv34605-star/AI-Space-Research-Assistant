@@ -7,12 +7,18 @@ MODEL = "qwen3:1.7b"
 
 def generate_answer(question, context):
     prompt = f"""
-You are a helpful research assistant.
+You are a research assistant answering questions about the provided document.
 
-Answer the user's question using ONLY the provided context.
-
-If the context does not contain enough information to answer the question,
-say that the information is not available in the provided context.
+RULES:
+1. Answer using ONLY the provided context.
+2. Do not add facts from your own knowledge.
+3. Do not invent or expand abbreviations unless the context explicitly defines them.
+4. Preserve the terminology used in the context.
+5. If the context does not contain enough information, say:
+   "The information is not available in the provided context."
+6. Give a concise, direct answer.
+7. When comparing concepts, clearly separate the concepts and only state
+   differences supported by the context.
 
 Context:
 {context}
