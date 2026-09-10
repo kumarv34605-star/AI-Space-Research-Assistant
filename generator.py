@@ -1,42 +1,41 @@
+import os
 import requests
 
-
-OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_URL = os.getenv(
+    "OLLAMA_URL",
+    "http://localhost:11434/api/generate"
+)
 MODEL = "qwen3:1.7b"
 
 
 def generate_answer(question, context):
     prompt = f"""
-You are a research assistant answering questions about the provided document.
+    Answer the question using only the context below.
 
-RULES:
-1. Answer using ONLY the provided context.
-2. Do not add facts from your own knowledge.
-3. Do not invent or expand abbreviations unless the context explicitly defines them.
-4. Preserve the terminology used in the context.
-5. If the context does not contain enough information, say:
-   "The information is not available in the provided context."
-6. Give a concise, direct answer.
-7. When comparing concepts, clearly separate the concepts and only state
-   differences supported by the context.
+    Context:
+    {context}
 
-Context:
-{context}
+    Question:
+    {question}
 
-Question:
-{question}
+    If the context contains the answer, answer directly.
+    If it does not contain the answer, say:
+    "The information is not available in the provided context."
 
-Answer:
-"""
+    Answer:
+    """
 
     response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": MODEL,
-            "prompt": prompt,
-            "stream": False
+    OLLAMA_URL,
+    json={
+        "model": MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0
         }
-    )
+    }
+)
 
     response.raise_for_status()
 

@@ -22,27 +22,53 @@ def build_context(results):
     return "\n\n".join(context_parts)
 
 
+RELEVANCE_THRESHOLD = 1.0
+
+
 def answer_question(question):
 
     # 1. Retrieve relevant chunks
     results = retrieve(question, top_k=5)
 
-    # 2. Build context for the LLM
-    context = build_context(results)
+    # 2. Check whether the best retrieved chunk is relevant enough
+    best_distance = results[0]["distance"]
 
-    # 3. Generate answer using the retrieved context
+    if best_distance > RELEVANCE_THRESHOLD:
+        answer = (
+            "The information is not available in the provided context."
+        )
+        return answer, []
+
+    # 3. Build context for the LLM
+    context = build_context(results)
+    
+    
+
+    # 4. Generate answer using the retrieved context
     answer = generate_answer(
         question,
         context
     )
+
+    source_pages = sorted(
+        set(result["page"] for result in results)
+    )
+
+    citation = " [Pages " + ", ".join(map(str, source_pages)) + "]"
+
+    answer = answer.strip() + citation
 
     return answer, results
 
 
 if __name__ == "__main__":
 
+    
+    question = "What is Risk-Informed Decision Making?"
     #question = "What is systems engineering?"
-    question = "What is the difference between verification and validation?"
+    #question = "What is the difference between verification and validation?"
+    #question = "What is the nominal thrust of the Apollo Service Module engine?"
+    #question = "What is verification?"
     answer, results = answer_question(question)
 
     print("\n" + "=" * 70)

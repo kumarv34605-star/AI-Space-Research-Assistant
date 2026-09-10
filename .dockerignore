@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.git/
+.vscode/
+.idea/
+
+chroma_db/
+data/
+frontend/
+*.pyc
+*.pyo
+*.pyd
+
+.gitignore
+README.md
